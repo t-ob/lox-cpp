@@ -3,9 +3,9 @@
 #include <cstdint>
 #include <vector>
 #include <string>
-#include "value.h"
+#include "Value.h"
 
-enum class OpCode : uint8_t { OP_RETURN = 1, OP_CONSTANT };
+enum class OpCode : uint8_t { RETURN = 1, CONSTANT, NEGATE, ADD, SUBTRACT, MULTIPLY, DIVIDE };
 
 class Chunk {
 private:

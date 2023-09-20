@@ -1,16 +1,24 @@
 #include <iostream>
-#include "chunk.h"
+#include "Chunk.h"
 #include "debug.h"
+#include "Vm.h"
 
 int main() {
     std::cout << "Hello, World!" << std::endl;
 
+    Vm vm;
+    vm.setMode(VmMode::DEBUG);
+
     Chunk c;
-    c.write_byte(static_cast<uint8_t>(OpCode::OP_RETURN), 123);
-    c.write_byte(static_cast<uint8_t>(OpCode::OP_CONSTANT), 124);
-    auto i = c.add_constant(2.8);
-    c.write_byte(static_cast<uint8_t>(i), 124);
-    disassembleChunk(c, "test chunk");
+    c.write_byte(static_cast<uint8_t>(OpCode::CONSTANT), 124);
+    c.write_byte(static_cast<uint8_t>(c.add_constant(3.0)), 124);
+    c.write_byte(static_cast<uint8_t>(OpCode::CONSTANT), 125);
+    c.write_byte(static_cast<uint8_t>(c.add_constant(4.0)), 125);
+    c.write_byte(static_cast<uint8_t>(OpCode::NEGATE), 126);
+    c.write_byte(static_cast<uint8_t>(OpCode::SUBTRACT), 127);
+    c.write_byte(static_cast<uint8_t>(OpCode::RETURN), 128);
+
+    vm.interpret(c);
 
     return 0;
 }

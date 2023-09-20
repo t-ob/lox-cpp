@@ -1,4 +1,4 @@
-#include "chunk.h"
+#include "Chunk.h"
 
 void Chunk::write_byte(uint8_t byte, size_t line) {
     code.emplace_back(byte);
