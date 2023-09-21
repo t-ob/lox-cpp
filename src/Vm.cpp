@@ -4,8 +4,8 @@
 #include "Vm.h"
 #include "debug.h"
 
-InterpretResult Vm::interpret(Chunk c) {
-    chunk = std::move(c);
+InterpretResult Vm::interpret(const std::string &source) {
+    compiler.compile(source);
     return run();
 }
 

@@ -3,6 +3,7 @@
 #include <array>
 
 #include "Chunk.h"
+#include "Compiler.h"
 
 constexpr size_t STACK_MAX = 1 << 10;
 
@@ -20,6 +21,7 @@ enum class VmMode {
 class Vm {
 private:
     Chunk chunk;
+    Compiler compiler;
     size_t ip;
     VmMode mode;
     std::array<Value, STACK_MAX> stack;
@@ -30,6 +32,6 @@ public:
     Vm();
 //    Vm(VmMode mode);
     void setMode(VmMode mode);
-    InterpretResult interpret(Chunk chunk);
+    InterpretResult interpret(const std::string &source);
     InterpretResult run();
 };
