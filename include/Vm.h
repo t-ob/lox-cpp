@@ -20,17 +20,16 @@ enum class VmMode {
 
 class Vm {
 private:
-    Chunk chunk;
-    Compiler compiler;
-    size_t ip;
-    VmMode mode;
-    std::array<Value, STACK_MAX> stack;
-    size_t sp;
+    Chunk chunk_;
+    Compiler compiler_;
+    size_t ip_;
+    VmMode mode_;
+    std::array<Value, STACK_MAX> stack_;
+    size_t sp_;
     void pushStack(Value value);
     Value popStack();
 public:
     Vm();
-//    Vm(VmMode mode);
     void setMode(VmMode mode);
     InterpretResult interpret(const std::string &source);
     InterpretResult run();

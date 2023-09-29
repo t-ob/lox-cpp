@@ -1,27 +1,27 @@
 #include "Chunk.h"
 
 void Chunk::write_byte(uint8_t byte, size_t line) {
-    code.emplace_back(byte);
-    lines.emplace_back(line);
+    code_.emplace_back(byte);
+    lines_.emplace_back(line);
 }
 
 size_t Chunk::size() const {
-    return code.size();
+    return code_.size();
 }
 
 uint8_t Chunk::at(size_t offset) const {
-    return code.at(offset);
+    return code_.at(offset);
 }
 
 size_t Chunk::add_constant(Value value) {
-    constants.emplace_back(value);
-    return constants.size() - 1;
+    constants_.emplace_back(value);
+    return constants_.size() - 1;
 }
 
 Value Chunk::constant_at(size_t offset) const {
-    return constants.at(offset);
+    return constants_.at(offset);
 }
 
 size_t Chunk::line_at(size_t offset) const {
-    return lines.at(offset);
+    return lines_.at(offset);
 }

@@ -9,9 +9,9 @@ enum class OpCode : uint8_t { RETURN = 1, CONSTANT, NEGATE, ADD, SUBTRACT, MULTI
 
 class Chunk {
 private:
-    std::vector<uint8_t> code;
-    std::vector<Value> constants;
-    std::vector<size_t> lines;
+    std::vector<uint8_t> code_;
+    std::vector<Value> constants_;
+    std::vector<size_t> lines_;
 public:
     void write_byte(uint8_t byte, size_t line);
     size_t add_constant(Value value);

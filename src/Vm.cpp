@@ -5,28 +5,28 @@
 #include "debug.h"
 
 InterpretResult Vm::interpret(const std::string &source) {
-    compiler.compile(source);
+    compiler_.compile(source);
     return run();
 }
 
 InterpretResult Vm::run() {
     while (true) {
-        if (mode == VmMode::DEBUG) {
+        if (mode_ == VmMode::DEBUG) {
             std::cout << "Stack contents:\t";
-            for (auto i = 0; i < sp; ++i) {
-                std::cout << "[ " << stack[i] << " ]";
+            for (auto i = 0; i < sp_; ++i) {
+                std::cout << "[ " << stack_[i] << " ]";
             }
             std::cout << std::endl;
-            disassembleInstruction(chunk, ip);
+            disassembleInstruction(chunk_, ip_);
         }
-        auto instruction = chunk.at(ip++);
+        auto instruction = chunk_.at(ip_++);
         switch (static_cast<OpCode>(instruction)) {
             case OpCode::RETURN: {
                 auto ret = popStack();
                 return InterpretResult::OK;
             }
             case OpCode::CONSTANT: {
-                auto constant = chunk.constant_at(chunk.at(ip++));
+                auto constant = chunk_.constant_at(chunk_.at(ip_++));
                 pushStack(constant);
                 break;
             }
@@ -62,18 +62,18 @@ InterpretResult Vm::run() {
     }
 }
 
-Vm::Vm() : ip(0), sp(0), mode(VmMode::STANDARD) {
-    stack.fill(0);
+Vm::Vm() : ip_(0), sp_(0), mode_(VmMode::STANDARD) {
+    stack_.fill(0);
 }
 
 void Vm::setMode(VmMode mode) {
-    this->mode = mode;
+    this->mode_ = mode;
 }
 
 void Vm::pushStack(Value value) {
-    stack[sp++] = value;
+    stack_[sp_++] = value;
 }
 
 Value Vm::popStack() {
-    return stack[--sp];
+    return stack_[--sp_];
 }
