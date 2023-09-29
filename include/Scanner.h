@@ -39,4 +39,6 @@ public:
     Scanner(std::string source);
 
     Token scanToken();
+
+    [[nodiscard]] const std::string &getSource() const;
 };

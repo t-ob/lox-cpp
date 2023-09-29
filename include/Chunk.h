@@ -14,7 +14,7 @@ private:
     std::vector<size_t> lines_;
 public:
     void write_byte(uint8_t byte, size_t line);
-    size_t add_constant(Value value);
+    size_t addConstant(Value value);
     [[nodiscard]] uint8_t at(size_t offset) const;
     [[nodiscard]] Value constant_at(size_t offset) const;
     [[nodiscard]] size_t line_at(size_t offset) const;

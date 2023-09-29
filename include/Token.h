@@ -18,6 +18,9 @@ private:
     size_t line_;
     std::optional<std::string> message_;
 public:
-    Token() = delete;
     Token(TokenType type, size_t start, size_t length, size_t line, std::optional<std::string> message);
+    [[nodiscard]] TokenType getType() const;
+    [[nodiscard]] size_t getStart() const;
+    [[nodiscard]] size_t getLine() const;
+    [[nodiscard]] size_t getLength() const;
 };

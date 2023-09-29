@@ -5,7 +5,17 @@
 #include "debug.h"
 
 InterpretResult Vm::interpret(const std::string &source) {
-    compiler_.compile(source);
+    Chunk chunk;
+
+    auto compileResult = compiler_.compile(source, chunk);
+
+    if (compileResult == CompileResult::ERROR) {
+        return InterpretResult::COMPILE_ERROR;
+    }
+
+    chunk_ = chunk;
+    ip_ = 0;
+
     return run();
 }
 

@@ -177,3 +177,7 @@ TokenType Scanner::checkKeyword(int start, int length, const char *rest, TokenTy
     if (current_ - start_ == start + length && source_.compare(start_ + start, length, rest) == 0) return type;
     return TokenType::IDENTIFIER;
 }
+
+const std::string &Scanner::getSource() const {
+    return source_;
+}

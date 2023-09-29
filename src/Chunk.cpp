@@ -13,7 +13,7 @@ uint8_t Chunk::at(size_t offset) const {
     return code_.at(offset);
 }
 
-size_t Chunk::add_constant(Value value) {
+size_t Chunk::addConstant(Value value) {
     constants_.emplace_back(value);
     return constants_.size() - 1;
 }
