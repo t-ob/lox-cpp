@@ -55,7 +55,7 @@ public:
 
     void errorAt(const Scanner &scanner, const Token &token, const std::string &message);
 
-    void consume(Scanner scanner, TokenType type, const std::string &message);
+    void consume(Scanner &scanner, TokenType type, const std::string &message);
 
     void emitByte(Chunk &chunk, uint8_t byte) const;
 

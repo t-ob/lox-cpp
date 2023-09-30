@@ -58,7 +58,7 @@ void Compiler::errorAt(const Scanner &scanner, const Token &token, const std::st
     parser_.hadError = true;
 }
 
-void Compiler::consume(Scanner scanner, TokenType type, const std::string &message) {
+void Compiler::consume(Scanner &scanner, TokenType type, const std::string &message) {
     if (parser_.current->getType() == type) {
         advance(scanner);
         return;
@@ -136,6 +136,7 @@ void Compiler::parsePrecedence(const std::string &src, Scanner &scanner, Chunk &
     auto prefixRule = getRule(parser_.previous->getType()).prefix;
     if (prefixRule == nullptr) {
         error(scanner, "Expect expression.");
+        return;
     }
 
     (this->*prefixRule)(src, scanner, chunk);

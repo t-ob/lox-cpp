@@ -61,8 +61,7 @@ bool Scanner::isAtEnd() {
 }
 
 char Scanner::advance() {
-    current_++;
-    return source_[current_ - 1];
+    return source_[current_++];
 }
 
 bool Scanner::match(char expected) {
