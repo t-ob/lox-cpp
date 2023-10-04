@@ -58,10 +58,13 @@ public:
     void consume(Scanner &scanner, TokenType type, const std::string &message);
 
     void emitByte(Chunk &chunk, uint8_t byte) const;
+    void emitByte(Chunk &chunk, OpCode opCode) const;
 
     void endCompiler(Chunk &chunk) const;
 
     void emitBytes(Chunk &chunk, uint8_t byte1, uint8_t byte2) const;
+    void emitBytes(Chunk &chunk, OpCode opCode, uint8_t byte) const;
+    void emitBytes(Chunk &chunk, OpCode opCode1, OpCode opCode2) const;
 
     void number(const std::string &src, Scanner &scanner, Chunk &chunk);
 
@@ -74,6 +77,8 @@ public:
     void binary(const std::string &src, Scanner &scanner, Chunk &chunk);
 
     void unary(const std::string &src, Scanner &scanner, Chunk &chunk);
+
+    void literal(const std::string &src, Scanner &scanner, Chunk &chunk);
 
     void expression(const std::string &src, Scanner &scanner, Chunk &chunk);
 

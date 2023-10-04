@@ -28,6 +28,12 @@ private:
     size_t sp_;
     void pushStack(Value value);
     Value popStack();
+    Value peekStack(size_t depth);
+
+    template<typename... Args>
+    void runtimeError(Args ...args);
+
+    bool isFalsey(Value value);
 public:
     Vm();
     void setMode(VmMode mode);

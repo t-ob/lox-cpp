@@ -71,13 +71,27 @@ void Compiler::emitByte(Chunk &chunk, uint8_t byte) const {
     chunk.write_byte(byte, parser_.previous->getLine());
 }
 
+void Compiler::emitByte(Chunk &chunk, OpCode opCode) const {
+    emitByte(chunk, static_cast<uint8_t>(opCode));
+};
+
 void Compiler::emitBytes(Chunk &chunk, uint8_t byte1, uint8_t byte2) const {
     emitByte(chunk, byte1);
     emitByte(chunk, byte2);
 }
 
+void Compiler::emitBytes(Chunk &chunk, OpCode opCode, uint8_t byte) const {
+    emitByte(chunk, opCode);
+    emitByte(chunk, byte);
+}
+
+void Compiler::emitBytes(Chunk &chunk, OpCode opCode1, OpCode opCode2) const {
+    emitByte(chunk, opCode1);
+    emitByte(chunk, opCode2);
+}
+
 void Compiler::endCompiler(Chunk &chunk) const {
-    emitByte(chunk, static_cast<uint8_t>(OpCode::RETURN));
+    emitByte(chunk, OpCode::RETURN);
 }
 
 void Compiler::binary(const std::string &src, Scanner &scanner, Chunk &chunk) {
@@ -87,19 +101,43 @@ void Compiler::binary(const std::string &src, Scanner &scanner, Chunk &chunk) {
     parsePrecedence(src, scanner, chunk, static_cast<Precedence>(p + 1));
     switch (operatorType) {
         case TokenType::PLUS: {
-            emitByte(chunk, static_cast<uint8_t>(OpCode::ADD));
+            emitByte(chunk, OpCode::ADD);
             break;
         }
         case TokenType::MINUS: {
-            emitByte(chunk, static_cast<uint8_t>(OpCode::SUBTRACT));
+            emitByte(chunk, OpCode::SUBTRACT);
             break;
         }
         case TokenType::STAR: {
-            emitByte(chunk, static_cast<uint8_t>(OpCode::MULTIPLY));
+            emitByte(chunk, OpCode::MULTIPLY);
             break;
         }
         case TokenType::SLASH: {
-            emitByte(chunk, static_cast<uint8_t>(OpCode::DIVIDE));
+            emitByte(chunk, OpCode::DIVIDE);
+            break;
+        }
+        case TokenType::BANG_EQUAL: {
+            emitBytes(chunk, OpCode::EQUAL, OpCode::NOT);
+            break;
+        }
+        case TokenType::EQUAL_EQUAL: {
+            emitByte(chunk, OpCode::EQUAL);
+            break;
+        }
+        case TokenType::GREATER: {
+            emitByte(chunk, OpCode::GREATER);
+            break;
+        }
+        case TokenType::GREATER_EQUAL: {
+            emitBytes(chunk, OpCode::LESS, OpCode::NOT);
+            break;
+        }
+        case TokenType::LESS: {
+            emitByte(chunk, OpCode::LESS);
+            break;
+        }
+        case TokenType::LESS_EQUAL: {
+            emitBytes(chunk, OpCode::GREATER, OpCode::NOT);
             break;
         }
     }
@@ -113,7 +151,18 @@ void Compiler::grouping(const std::string &src, Scanner &scanner, Chunk &chunk) 
 void Compiler::number(const std::string &src, Scanner &scanner, Chunk &chunk) {
     auto startIdx = parser_.previous->getStart();
     auto val = std::stod(src.data() + startIdx);
-    emitConstant(chunk, scanner, val);
+    emitConstant(chunk, scanner, Value::Number(val));
+}
+
+void Compiler::literal(const std::string &src, Scanner &scanner, Chunk &chunk) {
+    switch (parser_.previous->getType()) {
+        case TokenType::FALSE:
+            emitByte(chunk, OpCode::FALSE); break;
+        case TokenType::NIL:
+            emitByte(chunk, OpCode::NIL); break;
+        case TokenType::TRUE:
+            emitByte(chunk, OpCode::TRUE); break;
+    }
 }
 
 void Compiler::unary(const std::string &src, Scanner &scanner, Chunk &chunk) {
@@ -122,8 +171,13 @@ void Compiler::unary(const std::string &src, Scanner &scanner, Chunk &chunk) {
     parsePrecedence(src, scanner, chunk, Precedence::UNARY);
 
     switch (operatorType) {
+        case TokenType::BANG: {
+            std::cout << "!!!!!!! " << std::endl;
+            emitByte(chunk, OpCode::NOT);
+            break;
+        }
         case TokenType::MINUS: {
-            emitByte(chunk, static_cast<uint8_t>(OpCode::NEGATE));
+            emitByte(chunk, OpCode::NEGATE);
             break;
         }
         default:
@@ -149,7 +203,7 @@ void Compiler::parsePrecedence(const std::string &src, Scanner &scanner, Chunk &
 }
 
 void Compiler::emitConstant(Chunk &chunk, Scanner &scanner, Value value) {
-    emitBytes(chunk, static_cast<uint8_t>(OpCode::CONSTANT), makeConstant(chunk, scanner, value));
+    emitBytes(chunk, OpCode::CONSTANT, makeConstant(chunk, scanner, value));
 }
 
 uint8_t Compiler::makeConstant(Chunk &chunk, Scanner &scanner, Value value) {
@@ -176,30 +230,30 @@ Compiler::Compiler() {
     rules_.insert({TokenType::SEMICOLON, {nullptr, nullptr, Precedence::NONE }});
     rules_.insert({TokenType::SLASH, {nullptr, &Compiler::binary, Precedence::FACTOR }});
     rules_.insert({TokenType::STAR, {nullptr, &Compiler::binary, Precedence::FACTOR }});
-    rules_.insert({TokenType::BANG, {nullptr, nullptr, Precedence::NONE }});
-    rules_.insert({TokenType::BANG_EQUAL, {nullptr, nullptr, Precedence::NONE }});
+    rules_.insert({TokenType::BANG, {&Compiler::unary, nullptr, Precedence::NONE }});
+    rules_.insert({TokenType::BANG_EQUAL, {nullptr, &Compiler::binary, Precedence::EQUALITY }});
     rules_.insert({TokenType::EQUAL, {nullptr, nullptr, Precedence::NONE }});
-    rules_.insert({TokenType::EQUAL_EQUAL, {nullptr, nullptr, Precedence::NONE }});
-    rules_.insert({TokenType::GREATER, {nullptr, nullptr, Precedence::NONE }});
-    rules_.insert({TokenType::GREATER_EQUAL, {nullptr, nullptr, Precedence::NONE }});
-    rules_.insert({TokenType::LESS, {nullptr, nullptr, Precedence::NONE }});
-    rules_.insert({TokenType::LESS_EQUAL, {nullptr, nullptr, Precedence::NONE }});
+    rules_.insert({TokenType::EQUAL_EQUAL, {nullptr, &Compiler::binary, Precedence::EQUALITY }});
+    rules_.insert({TokenType::GREATER, {nullptr, &Compiler::binary, Precedence::COMPARISON }});
+    rules_.insert({TokenType::GREATER_EQUAL, {nullptr, &Compiler::binary, Precedence::COMPARISON }});
+    rules_.insert({TokenType::LESS, {nullptr, &Compiler::binary, Precedence::COMPARISON }});
+    rules_.insert({TokenType::LESS_EQUAL, {nullptr, &Compiler::binary, Precedence::COMPARISON }});
     rules_.insert({TokenType::IDENTIFIER, {nullptr, nullptr, Precedence::NONE }});
     rules_.insert({TokenType::NUMBER, {&Compiler::number, nullptr, Precedence::TERM }});
     rules_.insert({TokenType::AND, {nullptr, nullptr, Precedence::NONE }});
     rules_.insert({TokenType::CLASS, {nullptr, nullptr, Precedence::NONE }});
     rules_.insert({TokenType::ELSE, {nullptr, nullptr, Precedence::NONE }});
-    rules_.insert({TokenType::FALSE, {nullptr, nullptr, Precedence::NONE }});
+    rules_.insert({TokenType::FALSE, {&Compiler::literal, nullptr, Precedence::NONE }});
     rules_.insert({TokenType::FOR, {nullptr, nullptr, Precedence::NONE }});
     rules_.insert({TokenType::FUN, {nullptr, nullptr, Precedence::NONE }});
     rules_.insert({TokenType::IF, {nullptr, nullptr, Precedence::NONE }});
-    rules_.insert({TokenType::NIL, {nullptr, nullptr, Precedence::NONE }});
+    rules_.insert({TokenType::NIL, {&Compiler::literal, nullptr, Precedence::NONE }});
     rules_.insert({TokenType::OR, {nullptr, nullptr, Precedence::NONE }});
     rules_.insert({TokenType::PRINT, {nullptr, nullptr, Precedence::NONE }});
     rules_.insert({TokenType::RETURN, {nullptr, nullptr, Precedence::NONE }});
     rules_.insert({TokenType::SUPER, {nullptr, nullptr, Precedence::NONE }});
     rules_.insert({TokenType::THIS, {nullptr, nullptr, Precedence::NONE }});
-    rules_.insert({TokenType::TRUE, {nullptr, nullptr, Precedence::NONE }});
+    rules_.insert({TokenType::TRUE, {&Compiler::literal, nullptr, Precedence::NONE }});
     rules_.insert({TokenType::VAR, {nullptr, nullptr, Precedence::NONE }});
     rules_.insert({TokenType::WHILE, {nullptr, nullptr, Precedence::NONE }});
     rules_.insert({TokenType::ERROR, {nullptr, nullptr, Precedence::NONE }});
@@ -208,7 +262,7 @@ Compiler::Compiler() {
 
 Compiler::ParseRule &Compiler::getRule(TokenType type) {
     return rules_[type];
-};
+}
 
 Parser::Parser() {
     current = std::nullopt;

@@ -23,6 +23,20 @@ std::pair<std::string, size_t> op_code_info(const OpCode &op_code) {
             return { "MULTIPLY", 1 };
         case OpCode::DIVIDE:
             return { "DIVIDE", 1 };
+        case OpCode::NIL:
+            return { "NIL", 1 };
+        case OpCode::TRUE:
+            return { "TRUE", 1 };
+        case OpCode::FALSE:
+            return { "FALSE", 1 };
+        case OpCode::NOT:
+            return { "NOT", 1 };
+        case OpCode::EQUAL:
+            return { "EQUAL", 1 };
+        case OpCode::GREATER:
+            return { "GREATER", 1 };
+        case OpCode::LESS:
+            return { "LESS", 1 };
     }
 }
 

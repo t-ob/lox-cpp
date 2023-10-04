@@ -5,7 +5,7 @@
 #include <string>
 #include "Value.h"
 
-enum class OpCode : uint8_t { RETURN = 1, CONSTANT, NEGATE, ADD, SUBTRACT, MULTIPLY, DIVIDE };
+enum class OpCode : uint8_t { RETURN = 1, CONSTANT, NEGATE, ADD, SUBTRACT, MULTIPLY, DIVIDE, NIL, TRUE, FALSE, NOT, EQUAL, GREATER, LESS };
 
 class Chunk {
 private:
